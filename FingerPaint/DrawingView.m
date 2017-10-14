@@ -11,15 +11,38 @@
 
 @interface DrawingView ()
 
-@property (nonatomic) NSMutableArray<LineSegmentDataModel *> *line;
+@property (nonatomic) NSMutableArray<LineSegmentDataModel *> *blackLineArr;
+@property (nonatomic) NSMutableArray<LineSegmentDataModel *> *blueLineArr;
+@property (nonatomic) NSMutableArray<LineSegmentDataModel *> *redLineArr;
+@property (nonatomic , weak) UIColor *color;
 
 @end
 
 @implementation DrawingView
 
+- (IBAction)color:(id)sender {
+    switch ([sender tag]) {
+        case 0: {
+            self.color = [UIColor blackColor];
+            break;
+        }
+        case 1 : {
+            self.color = [UIColor blueColor];
+            break;
+        }
+        case 2 : {
+            self.color = [UIColor redColor];
+            break;
+        }
+    }
+}
+
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        _line = [NSMutableArray new];
+        _blackLineArr = [NSMutableArray new];
+        _blueLineArr = [NSMutableArray new];
+        _redLineArr = [NSMutableArray new];
+        _color = [UIColor blackColor];
     }
     return self;
 }
@@ -31,7 +54,15 @@
 
     LineSegmentDataModel *segment = [[LineSegmentDataModel alloc] initWithFirstPoint:first
                                                                          secondPoint:first];
-    [self.line addObject:segment];
+    if (self.color == [UIColor blackColor]){
+        [self.blackLineArr addObject:segment];
+    }
+    else if (self.color == [UIColor blueColor]) {
+        [self.blueLineArr addObject:segment];
+    }
+    else if (self.color == [UIColor redColor]) {
+        [self.redLineArr addObject:segment];
+    }
 
     [self setNeedsDisplay];
 }
@@ -42,8 +73,17 @@
     CGPoint second = [touch locationInView:self];
     LineSegmentDataModel *segment = [[LineSegmentDataModel alloc] initWithFirstPoint:first
                                                                          secondPoint:second];
-    [self.line addObject:segment];
-    NSLog(@"%@, %@", NSStringFromCGPoint(segment.firstPoint), NSStringFromCGPoint(segment.secondPoint));
+    
+    if (self.color == [UIColor blackColor]){
+        [self.blackLineArr addObject:segment];
+    }
+    else if (self.color == [UIColor blueColor]) {
+        [self.blueLineArr addObject:segment];
+    }
+    else if (self.color == [UIColor redColor]) {
+        [self.redLineArr addObject:segment];
+    }
+
     
     [self setNeedsDisplay];
 }
@@ -54,12 +94,44 @@
         UIBezierPath *path = [UIBezierPath bezierPath];
         path.lineWidth = 5.0;
         path.lineCapStyle = kCGLineCapRound;
-        UIColor *gray = [UIColor grayColor];
-        [gray setStroke];
-        
-        for (LineSegmentDataModel *segment in self.line) {
-            if (CGPointEqualToPoint(segment.firstPoint, segment.secondPoint)) {
+        [[UIColor blackColor] setStroke];
 
+        for (LineSegmentDataModel *segment in self.blackLineArr) {
+            if (CGPointEqualToPoint(segment.firstPoint, segment.secondPoint)) {
+                [path moveToPoint:segment.firstPoint];
+                continue;
+            }
+            [path addLineToPoint:segment.firstPoint];
+            [path addLineToPoint:segment.secondPoint];
+        }
+        [path stroke];
+    }
+    
+    {
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        path.lineWidth = 5.0;
+        path.lineCapStyle = kCGLineCapRound;
+        [[UIColor blueColor] setStroke];
+        
+        for (LineSegmentDataModel *segment in self.blueLineArr) {
+            if (CGPointEqualToPoint(segment.firstPoint, segment.secondPoint)) {
+                [path moveToPoint:segment.firstPoint];
+                continue;
+            }
+            [path addLineToPoint:segment.firstPoint];
+            [path addLineToPoint:segment.secondPoint];
+        }
+        [path stroke];
+    }
+    
+    {
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        path.lineWidth = 5.0;
+        path.lineCapStyle = kCGLineCapRound;
+        [[UIColor redColor] setStroke];
+        
+        for (LineSegmentDataModel *segment in self.redLineArr) {
+            if (CGPointEqualToPoint(segment.firstPoint, segment.secondPoint)) {
                 [path moveToPoint:segment.firstPoint];
                 continue;
             }
@@ -72,7 +144,7 @@
 }
 
 - (void)clear {
-    [self.line removeAllObjects];
+    [self.blackLineArr removeAllObjects];
     [self setNeedsDisplay];
 }
 
