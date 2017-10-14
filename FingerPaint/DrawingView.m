@@ -145,6 +145,8 @@
 
 - (void)clear {
     [self.blackLineArr removeAllObjects];
+    [self.blueLineArr removeAllObjects];
+    [self.redLineArr removeAllObjects];
     [self setNeedsDisplay];
 }
 
